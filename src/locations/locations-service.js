@@ -4,7 +4,6 @@ const LocationsService = {
             .select('*')
             .from('locations')
             .where('user_id', user_id)
-            .first()
     },
     getById(knex, user_id, id) {
         return knex

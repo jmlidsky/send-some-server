@@ -9,7 +9,7 @@ const bodyParser = express.json()
 
 const serializeLocation = location => ({
     id: location.id,
-    user_id: location.user.id,
+    user_id: location.user_id,
     location_name: xss(location.location_name),
 })
 
