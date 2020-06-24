@@ -8,7 +8,7 @@ TRUNCATE
 
 INSERT INTO users (email, username, password)
 VALUES
-('demo@gmail.com', 'demo', 'demo');
+('demo@gmail.com', 'demo', '$2a$12$AhvvRcrQlStNPbOJM/.JuO6fOcoN0N1hMGoNpODQHLf54kx7Ddvta');
 
 INSERT INTO locations (user_id, location_name)
 VALUES
