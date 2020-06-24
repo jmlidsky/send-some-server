@@ -25,7 +25,7 @@ locationsRouter
             .catch(next);
     })
 
-    .post([bodyParser, requireAuth], (req, res, next) => {
+    .post(bodyParser, requireAuth, (req, res, next) => {
         console.log(req.body)
         const { location_name } = req.body;
         console.log('found user id', req.user.id)
