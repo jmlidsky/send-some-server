@@ -18,15 +18,15 @@ VALUES
 (2, 'The New'),
 (2, 'Coopers');
 
-INSERT INTO problems (location_id, problem_name, grade, area, notes, sent)
+INSERT INTO problems (location_id, user_id, problem_name, grade, area, notes, sent)
 VALUES
-(2, 'Belly Up', 'V4', 'Jonah Boulder', 'knee scum', 
+(2, 1, 'Belly Up', 'V4', 'Jonah Boulder', 'knee scum', 
 false),
-(2, 'Dish Right', 'V4', 'Jonah Boulder', 'skip first few crimps to good crimp?', false),
-(2, 'The Pigman', 'V3', 'Hog Rock', 'find feet ahead of time',true),
-(1, 'Doctor', 'V2', '', '', true),
-(1, 'I Love Luci', 'V3', '', 'push through feet for big right hand move', true),
-(3, 'Friends of Coal', 'V2', 'Meadow Top', 'sharp holds, heel hooks work well', true),
-(4, 'Ships Traverse', 'V4', '', '', false);
+(2, 1, 'Dish Right', 'V4', 'Jonah Boulder', 'skip first few crimps to good crimp?', false),
+(2, 1, 'The Pigman', 'V3', 'Hog Rock', 'find feet ahead of time',true),
+(1, 1, 'Doctor', 'V2', '', '', true),
+(3, 2,'I Love Luci', 'V3', '', 'push through feet for big right hand move', true),
+(1, 1,'Friends of Coal', 'V2', 'Meadow Top', 'sharp holds, heel hooks work well', true),
+(4, 2, 'Ships Traverse', 'V4', '', '', false);
 
 COMMIT;

@@ -19,9 +19,10 @@ const serializeProblem = problem => ({
 
 problemsRouter
     .route('/')
-    .get(requireAuth, (req, res, next) => {
-        ProblemsService.getAllProblemsByLocationId(
-            req.app.get('db'), req.user.id
+    .post(requireAuth, (req, res, next) => {
+        console.log(req.body, req.params)
+        ProblemsService.getAllProblemsByLocationAndUserId(
+            req.app.get('db'), req.params.location_id, req.body.user_id
         )
             .then(problems => {
                 res.json(problems.map(serializeProblem))

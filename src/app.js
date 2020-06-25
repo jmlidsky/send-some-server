@@ -20,7 +20,7 @@ app.use(helmet())
 app.use(cors())
 
 app.use('/api/locations', locationsRouter)
-app.use('/api/problems', problemsRouter)
+app.use('/api/locations/:id/problems', problemsRouter)
 app.use('/api/auth', authRouter)
 
 app.get('/', (req, res) => {

@@ -1,9 +1,10 @@
 const ProblemsService = {
-    getAllProblemsByLocationId(knex, location_id) {
+    getAllProblemsByLocationAndUserId(knex, location_id, user_id) {
         return knex
             .select('*')
             .from('problems')
             .where('location_id', location_id)
+            .where('user_id', user_id)
     },
     getById(knex, location_id, id) {
         return knex
@@ -23,15 +24,13 @@ const ProblemsService = {
                 return rows[0]
             })
     },
-    deleteProblem(knex, location_id, id) {
+    deleteProblem(knex, id) {
         return knex('problems')
-            .where('location_id', location_id)
             .where({ id })
             .delete()
     },
-    updateProblem(knex, location_id, id, newProblemFields) {
+    updateProblem(knex, id, newProblemFields) {
         return knex('problems')
-            .where('location_id', location_id)
             .where({ id })
             .update(newProblemFields)
     },
