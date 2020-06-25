@@ -10,6 +10,7 @@ const bodyParser = express.json()
 const serializeProblem = problem => ({
     id: problem.id,
     location_id: problem.location_id,
+    user_id: problem.user_id,
     problem_name: xss(problem.problem_name),
     grade: xss(problem.grade),
     area: xss(problem.area),
@@ -22,7 +23,7 @@ problemsRouter
     .post(requireAuth, (req, res, next) => {
         console.log(req.body, req.params)
         ProblemsService.getAllProblemsByLocationAndUserId(
-            req.app.get('db'), req.params.location_id, req.body.user_id
+            req.app.get('db'), req.params.id, req.body.user_id
         )
             .then(problems => {
                 res.json(problems.map(serializeProblem))
@@ -32,10 +33,11 @@ problemsRouter
 
     .post(bodyParser, requireAuth, (req, res, next) => {
         console.log(req.body)
-        const { location_id, problem_name, grade, area, notes, sent } = req.body;
+        const { location_id, user_id, problem_name, grade, area, notes, sent } = req.body;
         console.log('found user id', req.user.id)
         const newProblem = {
             location_id: location_id,
+            user_id: user_id,
             problem_name,
             grade,
             area,
