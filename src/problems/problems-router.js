@@ -31,10 +31,10 @@ problemsRouter
 
     .post(bodyParser, requireAuth, (req, res, next) => {
         console.log(req.body)
-        const { problem_name, grade, area, notes, sent } = req.body;
+        const { location_id, problem_name, grade, area, notes, sent } = req.body;
         console.log('found user id', req.user.id)
         const newProblem = {
-            location_id: req.location_id,
+            location_id: location_id,
             problem_name,
             grade,
             area,
