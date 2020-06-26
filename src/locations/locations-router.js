@@ -13,6 +13,17 @@ const serializeLocation = location => ({
     location_name: xss(location.location_name),
 })
 
+const serializeProblem = problem => ({
+    id: problem.id,
+    location_id: problem.location_id,
+    user_id: problem.user_id,
+    problem_name: xss(problem.problem_name),
+    grade: xss(problem.grade),
+    area: xss(problem.area),
+    notes: xss(problem.notes),
+    sent: problem.sent,
+})
+
 locationsRouter
     .route('/')
     .get(requireAuth, (req, res, next) => {
@@ -55,12 +66,12 @@ locationsRouter
     })
 
 locationsRouter
-    .route('/:id')
+    .route('/:location_id')
     .all(requireAuth, (req, res, next) => {
-        const { id } = req.params
+        const { location_id } = req.params
         LocationsService.getById(
             req.app.get('db'), req.user.id,
-            id
+            location_id
         )
             .then(location => {
                 if (!location) {
@@ -77,10 +88,10 @@ locationsRouter
         res.json(serializeLocation(res.location))
     })
     .delete(requireAuth, (req, res, next) => {
-        const { id } = req.params;
+        const { location_id } = req.params;
         LocationsService.deleteLocation(
-            req.app.get('db'), req.user.id,
-            id
+            req.app.get('db'),
+            location_id
         )
             .then(() => {
                 res.status(204).end()
@@ -90,7 +101,7 @@ locationsRouter
     .patch(bodyParser, requireAuth, (req, res, next) => {
         const { location_name } = req.body
         const locationToUpdate = { location_name }
-        const { id } = req.params
+        const { location_id } = req.params
 
         const numberOfValues = Object.values(locationToUpdate).filter(Boolean).length
         if (numberOfValues === 0) {
@@ -103,7 +114,7 @@ locationsRouter
 
         LocationsService.updateLocation(
             req.app.get('db'), req.user.id,
-            id,
+            location_id,
             locationToUpdate
         )
             .then(numRowsAffected => {
@@ -112,4 +123,90 @@ locationsRouter
             .catch(next)
     })
 
+locationsRouter
+    .route('/:location_id/problems')
+    .get(requireAuth, (req, res, next) => {
+        console.log(req.body, req.params)
+        LocationsService.getAllProblemsByLocationAndUserId(
+            req.app.get('db'), req.params.location_id, req.user.id
+        )
+            .then(problems => {
+                res.json(problems.map(serializeProblem))
+            })
+            .catch(next);
+    })
+
+    .post(bodyParser, requireAuth, (req, res, next) => {
+        console.log(req.body)
+        const location_id = req.params.location_id
+        const user_id = req.user.id
+        const { problem_name, grade, area, notes, sent } = req.body;
+        console.log('found user id', req.user.id)
+        const newProblem = {
+            location_id: location_id,
+            user_id: user_id,
+            problem_name,
+            grade,
+            area,
+            notes,
+            sent
+        }
+
+        for (const [key, value] of Object.entries(newProblem)) {
+            if (value == null) {
+                return res.status(400).json({
+                    error: { message: `Missing '${key}' in request body` }
+                })
+            }
+        }
+
+        LocationsService.insertProblem(
+            req.app.get('db'),
+            newProblem
+        )
+            .then(problem => {
+                res.status(201)
+                    .location(path.posix.join(req.originalUrl, `/${problem.id}`))
+                    .json(serializeProblem(problem))
+            })
+            .catch(next)
+    })
+
+
+locationsRouter
+    .route('/:location_id/problems/:problem_id')
+    .delete(requireAuth, (req, res, next) => {
+        const { problem_id } = req.params;
+        LocationsService.deleteProblem(
+            req.app.get('db'),
+            problem_id
+        )
+            .then(() => {
+                res.status(204).end()
+            })
+            .catch(next)
+    })
+    .patch(bodyParser, requireAuth, (req, res, next) => {
+        const { problem_name, grade, area, notes, sent } = req.body
+        const problemToUpdate = { problem_name, grade, area, notes, sent }
+        const { problem_id } = req.params
+
+        const numberOfValues = Object.values(problemToUpdate).filter(Boolean).length
+        if (numberOfValues === 0) {
+            return res.status(400).json({
+                error: {
+                    message: `Request body must contain 'problem_name', 'grade', 'area', 'notes', 'sent'.`
+                }
+            })
+        }
+
+        LocationsService.updateProblem(
+            req.app.get('db'), problem_id,
+            problemToUpdate
+        )
+            .then(numRowsAffected => {
+                res.status(204).end()
+            })
+            .catch(next)
+    })
 module.exports = locationsRouter

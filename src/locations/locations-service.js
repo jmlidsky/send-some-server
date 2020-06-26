@@ -1,4 +1,5 @@
 const LocationsService = {
+    // locations
     getAllLocationsByUserId(knex, user_id) {
         return knex
             .select('*')
@@ -24,9 +25,8 @@ const LocationsService = {
             })
     },
     // not implemented
-    deleteLocation(knex, user_id, id) {
+    deleteLocation(knex, id) {
         return knex('locations')
-            .where('user_id', user_id)
             .where({ id })
             .delete()
     },
@@ -36,6 +36,33 @@ const LocationsService = {
             .where('user_id', user_id)
             .where({ id })
             .update(newLocationFields)
+    },
+    // problems
+    getAllProblemsByLocationAndUserId(knex, location_id, user_id) {
+        return knex
+            .select('*')
+            .from('problems')
+            .where('location_id', location_id)
+            .where('user_id', user_id)
+    },
+    insertProblem(knex, newProblem) {
+        return knex
+            .insert(newProblem)
+            .into('problems')
+            .returning('*')
+            .then(rows => {
+                return rows[0]
+            })
+    },
+    deleteProblem(knex, id) {
+        return knex('problems')
+            .where({ id })
+            .delete()
+    },
+    updateProblem(knex, id, newProblemFields) {
+        return knex('problems')
+            .where({ id })
+            .update(newProblemFields)
     },
 }
 

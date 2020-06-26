@@ -6,7 +6,6 @@ const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
 
 const locationsRouter = require('./locations/locations-router')
-const problemsRouter = require('./problems/problems-router')
 const authRouter = require('./auth/auth-router')
 
 const app = express()
@@ -20,7 +19,6 @@ app.use(helmet())
 app.use(cors())
 
 app.use('/api/locations', locationsRouter)
-app.use('/api/locations/:id/problems', problemsRouter)
 app.use('/api/auth', authRouter)
 
 app.get('/', (req, res) => {
