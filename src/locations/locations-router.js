@@ -126,7 +126,7 @@ locationsRouter
 locationsRouter
     .route('/:location_id/problems')
     .get(requireAuth, (req, res, next) => {
-        console.log(req.body, req.params)
+        console.log(req.params.location_id, req.user.id)
         LocationsService.getAllProblemsByLocationAndUserId(
             req.app.get('db'), req.params.location_id, req.user.id
         )
@@ -175,6 +175,26 @@ locationsRouter
 
 locationsRouter
     .route('/:location_id/problems/:problem_id')
+    .all(requireAuth, (req, res, next) => {
+        const { problem_id } = req.params
+        LocationsService.getProblemById(
+            req.app.get('db'), req.user.id,
+            problem_id
+        )
+            .then(problem => {
+                if (!problem) {
+                    return res.status(404).json({
+                        error: { message: `Problem doesn't exist` }
+                    })
+                }
+                res.problem = problem // save the location for the next middleware
+                next() // don't forget to call next so the next middleware happens!
+            })
+            .catch(next)
+    })
+    .get(requireAuth, (req, res, next) => {
+        res.json(serializeProblem(res.problem))
+    })
     .delete(requireAuth, (req, res, next) => {
         const { problem_id } = req.params;
         LocationsService.deleteProblem(

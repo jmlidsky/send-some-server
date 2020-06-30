@@ -5,6 +5,7 @@ const LocationsService = {
             .select('*')
             .from('locations')
             .where('user_id', user_id)
+            .orderBy('location_name')
     },
     getById(knex, user_id, id) {
         return knex
@@ -44,6 +45,15 @@ const LocationsService = {
             .from('problems')
             .where('location_id', location_id)
             .where('user_id', user_id)
+            .orderBy('problem_name')
+    },
+    getProblemById(knex, user_id, id) {
+        return knex
+        .select('*')
+        .from('problems')
+        .where('user_id', user_id)
+        .where('id', id)
+        .first()
     },
     insertProblem(knex, newProblem) {
         return knex
