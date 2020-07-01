@@ -123,7 +123,7 @@ describe('Auth Endpoints', function () {
                 })
             })
 
-            it(`responds 400 'Username already taken' when username isn't unique`, () => {
+            it(`responds 400 'Username or email already taken' when username isn't unique`, () => {
                 const duplicateUser = {
                     email: 'test email',
                     username: testUser.username,
@@ -132,43 +132,7 @@ describe('Auth Endpoints', function () {
                 return supertest(app)
                     .post('/api/auth/signup')
                     .send(duplicateUser)
-                    .expect(400, { error: `Username already taken` })
-            })
-        })
-
-        context(`Happy path`, () => {
-            it(`responds 201, serialized user, storing bcrypted password`, () => {
-                const newUser = {
-                    email: 'test email',
-                    username: 'test username',
-                    password: '11AAaa!!',
-                }
-                return supertest(app)
-                    .post('/api/auth/signup')
-                    .send(newUser)
-                    .expect(201)
-                    .expect(res => {
-                        expect(res.body).to.have.property('id')
-                        expect(res.body.email).to.eql(newUser.email)
-                        expect(res.body.username).to.eql(newUser.username)
-                        expect(res.body).to.not.have.property('password')
-                    })
-                    .expect(res =>
-                        db
-                            .from('users')
-                            .select('*')
-                            .where({ id: res.body.id })
-                            .first()
-                            .then(row => {
-                                expect(row.email).to.eql(newUser.email)
-                                expect(row.username).to.eql(newUser.username)
-
-                                return bcrypt.compare(newUser.password, row.password)
-                            })
-                            .then(compareMatch => {
-                                expect(compareMatch).to.be.true
-                            })
-                    )
+                    .expect(400, { error: `Username or email already taken` })
             })
         })
     })
