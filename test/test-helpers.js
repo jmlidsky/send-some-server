@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const config = require('../src/config')
 
 function makeUsersArray() {
     return [
@@ -28,7 +29,7 @@ function makeLocationsArray(users) {
 }
 
 function makeProblemsArray(users, locations) {
-    [
+    return [
         {
             id: 1,
             location_id: locations[1].id,
@@ -82,55 +83,56 @@ function makeProblemsArray(users, locations) {
     ]
 }
 
-function makeExpectedLocation(users, location) {
-    const user = users.find(user => user.id === location.user_id)
+// function makeExpectedLocation(users, location) {
+//     const user = users.find(user => user.id === location.user_id)
 
-    return {
-        id: location.id,
-        location_name: location.location_name,
-        user_id: {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            password: user.password
-        }
-    }
-}
+//     return {
+//         id: location.id,
+//         location_name: location.location_name,
+//         user_id: {
+//             id: user.id,
+//             email: user.email,
+//             username: user.username,
+//             password: user.password
+//         }
+//     }
+// }
 
-function makeExpectedProblem(users, locations, problem) {
-    const user = users.find(user => user.id === problem.user_id)
-    const location = locations.find(location => location.id === problem.location_id)
+// function makeExpectedProblem(users, locations, problem) {
+//     const user = users.find(user => user.id === problem.user_id)
+//     const location = locations.find(location => location.id === problem.location_id)
 
-    return {
-        id: problem.id,
-        problem_name: problem.problem_name,
-        grade: problem.grade,
-        area: problem.area,
-        notes: problem.notes,
-        sent: problem.sent,
-        user_id: {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            password: user.password
-        },
-        location_id: {
-            id: location.id,
-            location_name: location.location_name,
-            user_id: {
-                id: user.id,
-                email: user.email,
-                username: user.username,
-                password: user.password
-            },
-        }
-    }
-}
+//     return {
+//         id: problem.id,
+//         problem_name: problem.problem_name,
+//         grade: problem.grade,
+//         area: problem.area,
+//         notes: problem.notes,
+//         sent: problem.sent,
+//         user_id: {
+//             id: user.id,
+//             email: user.email,
+//             username: user.username,
+//             password: user.password
+//         },
+//         location_id: {
+//             id: location.id,
+//             location_name: location.location_name,
+//             user_id: {
+//                 id: user.id,
+//                 email: user.email,
+//                 username: user.username,
+//                 password: user.password
+//             }
+//         }
+//     }
+// }
 
 function makeFixtures() {
     const testUsers = makeUsersArray()
     const testLocations = makeLocationsArray(testUsers)
     const testProblems = makeProblemsArray(testUsers, testLocations)
+    // console.log(testUsers, testLocations, testProblems)
     return { testUsers, testLocations, testProblems }
 }
 
@@ -166,26 +168,24 @@ function seedDbTables(db, users, locations, problems) {
     })
 }
 
-function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
+function makeAuthHeader(user, secret = config.JWT_SECRET) {
     const token = jwt.sign({ user_id: user.id }, secret, {
-      subject: user.username,
-      algorithm: 'HS256',
+        subject: user.username,
+        expiresIn: config.JWT_EXPIRY,
+        algorithm: 'HS256',
     })
     return `Bearer ${token}`
-  }
+}
 
 module.exports = {
-            makeUsersArray,
-            makeLocationsArray,
-            makeProblemsArray,
-            makeExpectedLocation,
-            makeExpectedProblem,
+    makeUsersArray,
+    makeLocationsArray,
+    makeProblemsArray,
+    // makeExpectedLocation,
+    // makeExpectedProblem,
 
-            makeFixtures,
-            cleanTables,
-            seedDbTables,
-            // seedUsers,
-            // seedLocationsTable,
-            // seedProblemsTable,
-            makeAuthHeader
-        }
+    makeFixtures,
+    cleanTables,
+    seedDbTables,
+    makeAuthHeader
+}

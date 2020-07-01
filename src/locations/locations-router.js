@@ -37,9 +37,9 @@ locationsRouter
     })
 
     .post(bodyParser, requireAuth, (req, res, next) => {
-        console.log(req.body)
+        // console.log(req.body)
         const { location_name } = req.body;
-        console.log('found user id', req.user.id)
+        // console.log('found user id', req.user.id)
         const newLocation = {
             user_id: req.user.id,
             location_name,
@@ -126,7 +126,7 @@ locationsRouter
 locationsRouter
     .route('/:location_id/problems')
     .get(requireAuth, (req, res, next) => {
-        console.log(req.params.location_id, req.user.id)
+        // console.log(req.params.location_id, req.user.id)
         LocationsService.getAllProblemsByLocationAndUserId(
             req.app.get('db'), req.params.location_id, req.user.id
         )
@@ -137,11 +137,11 @@ locationsRouter
     })
 
     .post(bodyParser, requireAuth, (req, res, next) => {
-        console.log(req.body)
+        // console.log(req.body)
         const location_id = req.params.location_id
         const user_id = req.user.id
         const { problem_name, grade, area, notes, sent } = req.body;
-        console.log('found user id', req.user.id)
+        // console.log('found user id', req.user.id)
         const newProblem = {
             location_id: location_id,
             user_id: user_id,
