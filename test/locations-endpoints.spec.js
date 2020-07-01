@@ -123,7 +123,7 @@ describe.only('Locations Endpoints', function () {
 
         context('Given there are problems for a location in the database', () => {
             beforeEach('insert problems', () =>
-                helpers.seedProblemsTable(
+                helpers.seedDbTables(
                     db,
                     testUsers,
                     testLocations,
@@ -132,9 +132,9 @@ describe.only('Locations Endpoints', function () {
             )
 
             it('responds with 200 and the problems in a specified location', () => {
-                const location_id = 1
-                const expectedProblems = helpers.makeExpectedProblem(
-                    testUsers, testLocations
+                const location_id = 2
+                const expectedProblems = helpers.makeExpectedProblems(
+                    testUsers, testLocations, location_id, testProblems
                 )
 
                 return supertest(app)

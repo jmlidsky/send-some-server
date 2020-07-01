@@ -93,20 +93,23 @@ function makeExpectedLocation(users, location) {
     }
 }
 
-function makeExpectedProblem(users, locations, problem) {
-    const user = users.find(user => user.id === problem.user_id)
-    const location = locations.find(location => location.id === problem.location_id)
+function makeExpectedProblems(users, locations, location_id, problems) {
+    const expectedProblems = problems.filter(problem => problem.location_id === location_id)
 
-    return {
-        id: problem.id,
-        problem_name: problem.problem_name,
-        grade: problem.grade,
-        area: problem.area,
-        notes: problem.notes,
-        sent: problem.sent,
-        user_id: user.id,
-        location_id: location.id
-    }
+    return expectedProblems.map(problem => {
+        const problemUser = users.find(user => user.id === problem.user_id)
+        const problemLocation = locations.find(location => location.id === problem.location_id)
+        return {
+            id: problem.id,
+            location_id: problemLocation.id,
+            user_id: problemUser.id,
+            problem_name: problem.problem_name,
+            grade: problem.grade,
+            area: problem.area,
+            notes: problem.notes,
+            sent: problem.sent
+        }
+    })
 }
 
 function makeFixtures() {
@@ -207,7 +210,7 @@ module.exports = {
     seedLocationsTable,
     seedProblemsTable,
     makeExpectedLocation,
-    makeExpectedProblem,
+    makeExpectedProblems,
     makeFixtures,
     cleanTables,
     seedDbTables,
