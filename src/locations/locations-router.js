@@ -187,7 +187,7 @@ locationsRouter
                         error: { message: `Problem doesn't exist` }
                     })
                 }
-                res.problem = problem // save the location for the next middleware
+                res.problem = problem // save the problem for the next middleware
                 next() // don't forget to call next so the next middleware happens!
             })
             .catch(next)

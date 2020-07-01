@@ -25,13 +25,11 @@ const LocationsService = {
                 return rows[0]
             })
     },
-    // not implemented
     deleteLocation(knex, id) {
         return knex('locations')
             .where({ id })
             .delete()
     },
-    // not implemented
     updateLocation(knex, user_id, id, newLocationFields) {
         return knex('locations')
             .where('user_id', user_id)
