@@ -2,6 +2,7 @@ const knex = require('knex')
 const app = require('../src/app')
 const helpers = require('./test-helpers')
 const config = require('../src/config')
+const supertest = require('supertest')
 
 describe.only('Locations Endpoints', function () {
     let db
@@ -106,18 +107,18 @@ describe.only('Locations Endpoints', function () {
         })
     })
 
-    describe.only(`GET /api/locations/:location_id/problems`, () => {
+    describe(`GET /api/locations/:location_id/problems`, () => {
         context(`Given no problems`, () => {
             beforeEach(() =>
-                helpers.seedUsers(db, testUsers)
+                helpers.seedLocationsTable(db, testUsers, testLocations)
             )
 
-            it(`responds with 404`, () => {
+            it(`responds with 200 and an empty list`, () => {
                 const location_id = 123456
                 return supertest(app)
                     .get(`/api/locations/${location_id}/problems`)
                     .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
-                    .expect(404, { error: { message: `Problem doesn't exist` } })
+                    .expect(200, [])
             })
         })
 
@@ -141,6 +142,50 @@ describe.only('Locations Endpoints', function () {
                     .get(`/api/locations/${location_id}/problems`)
                     .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
                     .expect(200, expectedProblems)
+            })
+        })
+    })
+
+    describe.only(`GET /api/locations/:location_id/problems/:problem_id`, () => {
+        context(`Given no problems`, () => {
+            beforeEach('insert users', () =>
+                helpers.seedUsers(
+                    db,
+                    testUsers)
+            )
+
+            it(`responds with 404`, () => {
+                const location_id = 123456
+                const problem_id = 123445
+                return supertest(app)
+                    .get(`/api/locations/${location_id}/problems/${problem_id}`)
+                    .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
+                    .expect(404, { error: { message: `Problem doesn't exist` } })
+            })
+        })
+        context(`Given there are problems in the database`, () => {
+            beforeEach('insert problems', () =>
+                helpers.seedDbTables(
+                    db,
+                    testUsers,
+                    testLocations,
+                    testProblems)
+            )
+
+            it(`responds with 200 and a specific problem`, () => {
+                const location_id = 2
+                const problem_id = 1
+                const expectedProblem = helpers.makeExpectedProblems(
+                    testUsers,
+                    testLocations,
+                    testLocations[location_id - 1],
+                    testProblems
+                )
+
+                return supertest(app)
+                    .get(`/api/locations/${location_id}/problems/${problem_id}`)
+                    .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
+                    .expect(200, expectedProblem)
             })
         })
     })
