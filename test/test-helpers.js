@@ -83,50 +83,31 @@ function makeProblemsArray(users, locations) {
     ]
 }
 
-// function makeExpectedLocation(users, location) {
-//     const user = users.find(user => user.id === location.user_id)
+function makeExpectedLocation(users, location) {
+    const user = users.find(user => user.id === location.user_id)
 
-//     return {
-//         id: location.id,
-//         location_name: location.location_name,
-//         user_id: {
-//             id: user.id,
-//             email: user.email,
-//             username: user.username,
-//             password: user.password
-//         }
-//     }
-// }
+    return {
+        id: location.id,
+        location_name: location.location_name,
+        user_id: user.id
+    }
+}
 
-// function makeExpectedProblem(users, locations, problem) {
-//     const user = users.find(user => user.id === problem.user_id)
-//     const location = locations.find(location => location.id === problem.location_id)
+function makeExpectedProblem(users, locations, problem) {
+    const user = users.find(user => user.id === problem.user_id)
+    const location = locations.find(location => location.id === problem.location_id)
 
-//     return {
-//         id: problem.id,
-//         problem_name: problem.problem_name,
-//         grade: problem.grade,
-//         area: problem.area,
-//         notes: problem.notes,
-//         sent: problem.sent,
-//         user_id: {
-//             id: user.id,
-//             email: user.email,
-//             username: user.username,
-//             password: user.password
-//         },
-//         location_id: {
-//             id: location.id,
-//             location_name: location.location_name,
-//             user_id: {
-//                 id: user.id,
-//                 email: user.email,
-//                 username: user.username,
-//                 password: user.password
-//             }
-//         }
-//     }
-// }
+    return {
+        id: problem.id,
+        problem_name: problem.problem_name,
+        grade: problem.grade,
+        area: problem.area,
+        notes: problem.notes,
+        sent: problem.sent,
+        user_id: user.id,
+        location_id: location.id
+    }
+}
 
 function makeFixtures() {
     const testUsers = makeUsersArray()
@@ -183,6 +164,33 @@ function seedUsers(db, users) {
         )
 }
 
+function seedLocationsTable(db, users, locations) {
+    // use a transaction to group the queries and auto rollback on any failure
+    return db.transaction(async trx => {
+        await seedUsers(trx, users)
+        await trx.into('locations').insert(locations)
+        // update the auto sequence to match the forced id values
+        await trx.raw(
+            `SELECT setval('locations_id_seq', ?)`,
+            [locations[locations.length - 1].id],
+        )
+    })
+}
+
+function seedProblemsTable(db, users, locations, problems) {
+    // use a transaction to group the queries and auto rollback on any failure
+    return db.transaction(async trx => {
+        await seedUsers(trx, users)
+        await seedLocationsTable(trx, users, locations)
+        await trx.into('problems').insert(problems)
+        // update the auto sequence to match the forced id values
+        await trx.raw(
+            `SELECT setval('problems_id_seq', ?)`,
+            [problems[problems.length - 1].id],
+        )
+    })
+}
+
 function makeAuthHeader(user, secret = config.JWT_SECRET) {
     const token = jwt.sign({ user_id: user.id }, secret, {
         subject: user.username,
@@ -196,9 +204,10 @@ module.exports = {
     makeUsersArray,
     makeLocationsArray,
     makeProblemsArray,
-    // makeExpectedLocation,
-    // makeExpectedProblem,
-
+    seedLocationsTable,
+    seedProblemsTable,
+    makeExpectedLocation,
+    makeExpectedProblem,
     makeFixtures,
     cleanTables,
     seedDbTables,

@@ -7,7 +7,7 @@ const jsonBodyParser = express.json()
 authRouter
     .post('/signup', jsonBodyParser, (req, res, next) => {
         const { email, username, password } = req.body
-        // console.log(req.body)
+        console.log(req.body)
 
         for (const field of ['email', 'username', 'password'])
             if (!req.body[field])
