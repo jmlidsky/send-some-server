@@ -9,9 +9,10 @@ const AuthService = {
             .where({ username })
             .first()
     },
-    hasUserWithUsername(db, username) {
+    hasUserWithUsernameOrEmail(db, username, email) {
         return db('users')
             .where({ username })
+            .orWhere({ email })
             .first()
             .then((user) => !!user)
     },

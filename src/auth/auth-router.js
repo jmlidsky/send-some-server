@@ -7,7 +7,7 @@ const jsonBodyParser = express.json()
 authRouter
     .post('/signup', jsonBodyParser, (req, res, next) => {
         const { email, username, password } = req.body
-        console.log(req.body)
+        // console.log(req.body)
 
         for (const field of ['email', 'username', 'password'])
             if (!req.body[field])
@@ -15,10 +15,10 @@ authRouter
                     error: `Missing '${field}' in request body`,
                 });
 
-        AuthService.hasUserWithUsername(req.app.get('db'), username)
-            .then((hasUserWithUsername) => {
-                if (hasUserWithUsername)
-                    return res.status(400).json({ error: `Username already taken` });
+        AuthService.hasUserWithUsernameOrEmail(req.app.get('db'), username, email)
+            .then((hasUserWithUsernameOrEmail) => {
+                if (hasUserWithUsernameOrEmail)
+                    return res.status(400).json({ error: `Username or email already taken` });
 
                 return AuthService.hashPassword(password).then((hashedPassword) => {
                     const newUser = {
@@ -29,7 +29,11 @@ authRouter
 
                     return AuthService.insertUser(req.app.get('db'), newUser).then(
                         (user) => {
-                            res.status(201).json(AuthService.serializeUser(user));
+                            const sub = user.username
+                            const payload = { user_id: user.id }
+                            res.status(201).send({
+                                authToken: AuthService.createJwt(sub, payload),
+                            })
                         }
                     )
                 })
