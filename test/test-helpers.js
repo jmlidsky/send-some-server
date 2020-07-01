@@ -144,44 +144,24 @@ function cleanTables(db) {
     )
 }
 
-function seedUsers(db, users) {
-    const preppedUsers = users.map(user => ({
-        ...user,
-        password: bcrypt.hashSync(user.password, 1)
-    }))
-    return db.into('users').insert(preppedUsers)
-        .then(() =>
-            // update the auto sequence to stay in sync
-            db.raw(
-                `SELECT setval('users_id_seq', ?)`,
-                [users[users.length - 1].id],
-            )
-        )
-}
-
-function seedLocationsTable(db, users, locations) {
-    // use a transaction to group the queries and auto rollback on any failure
+function seedDbTables(db, users, locations, problems) {
     return db.transaction(async trx => {
-        await seedUsers(trx, users)
+        await trx.into('users').insert(users)
+        await trx.raw(
+            `SELECT setval('users_id_seq', ?)`,
+            [users[users.length - 1].id]
+        )
+
         await trx.into('locations').insert(locations)
-        // update the auto sequence to match the forced id values
         await trx.raw(
-            `SELECT setval('location_id_seq', ?)`,
-            [locations[locations.length - 1].id],
+            `SELECT setval('locations_id_seq', ?)`,
+            [locations[locations.length - 1].id]
         )
-    })
-}
 
-function seedProblemsTable(db, users, locations, problems) {
-    // use a transaction to group the queries and auto rollback on any failure
-    return db.transaction(async trx => {
-        await seedUsers(trx, users)
-        await seedLocationsTable(trx, users, locations)
         await trx.into('problems').insert(problems)
-        // update the auto sequence to match the forced id values
         await trx.raw(
-            `SELECT setval('problem_id_seq', ?)`,
-            [problems[problems.length - 1].id],
+            `SELECT setval('problems_id_seq', ?)`,
+            [problems[problems.length - 1].id]
         )
     })
 }
@@ -203,8 +183,9 @@ module.exports = {
 
             makeFixtures,
             cleanTables,
-            seedUsers,
-            seedLocationsTable,
-            seedProblemsTable,
+            seedDbTables,
+            // seedUsers,
+            // seedLocationsTable,
+            // seedProblemsTable,
             makeAuthHeader
         }
