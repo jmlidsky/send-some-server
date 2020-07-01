@@ -168,6 +168,21 @@ function seedDbTables(db, users, locations, problems) {
     })
 }
 
+function seedUsers(db, users) {
+    const preppedUsers = users.map(user => ({
+        ...user,
+        password: bcrypt.hashSync(user.password, 1)
+    }))
+    return db.into('users').insert(preppedUsers)
+        .then(() =>
+            // update the auto sequence to stay in sync
+            db.raw(
+                `SELECT setval('users_id_seq', ?)`,
+                [users[users.length - 1].id],
+            )
+        )
+}
+
 function makeAuthHeader(user, secret = config.JWT_SECRET) {
     const token = jwt.sign({ user_id: user.id }, secret, {
         subject: user.username,
@@ -187,5 +202,6 @@ module.exports = {
     makeFixtures,
     cleanTables,
     seedDbTables,
+    seedUsers,
     makeAuthHeader
 }
