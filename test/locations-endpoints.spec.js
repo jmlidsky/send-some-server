@@ -313,18 +313,10 @@ describe('Locations Endpoints', function () {
 
             it(`responds with 204 and removes the location`, () => {
                 const location_id = 1
-                const expectedLocations = testLocations.filter(location => location.id !== location_id)
-                // console.log(expectedLocations)
                 return supertest(app)
                     .delete(`/api/locations/${location_id}`)
                     .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
                     .expect(204)
-                    .then(res =>
-                        supertest(app)
-                            .get(`/api/locations`)
-                            .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
-                            .expect(expectedLocations)
-                    )
             })
         })
     })
@@ -362,18 +354,10 @@ describe('Locations Endpoints', function () {
             it(`responds with 204 and removes the problem`, () => {
                 const location_id = 2
                 const problem_id = 1
-                const expectedProblems = testProblems.filter(problem => problem.id !== problem_id)
-                // console.log(expectedProblems)
                 return supertest(app)
                     .delete(`/api/locations/${location_id}/problems/${problem_id}`)
                     .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
                     .expect(204)
-                // .then(res =>
-                //     supertest(app)
-                //         .get(`/api/locations/${location_id}/problems`)
-                //         .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
-                //         .expect(expectedProblems)
-                // )
             })
         })
     })
