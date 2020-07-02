@@ -180,20 +180,6 @@ function seedLocationsTable(db, users, locations) {
     })
 }
 
-// function seedProblemsTable(db, users, locations, problems) {
-//     // use a transaction to group the queries and auto rollback on any failure
-//     return db.transaction(async trx => {
-//         await seedUsers(trx, users)
-//         await seedLocationsTable(trx, users, locations)
-//         await trx.into('problems').insert(problems)
-//         // update the auto sequence to match the forced id values
-//         await trx.raw(
-//             `SELECT setval('problems_id_seq', ?)`,
-//             [problems[problems.length - 1].id],
-//         )
-//     })
-// }
-
 function makeAuthHeader(user, secret = config.JWT_SECRET) {
     const token = jwt.sign({ user_id: user.id }, secret, {
         subject: user.username,
@@ -208,7 +194,6 @@ module.exports = {
     makeLocationsArray,
     makeProblemsArray,
     seedLocationsTable,
-    // seedProblemsTable,
     makeExpectedLocation,
     makeExpectedProblems,
     makeFixtures,
