@@ -26,7 +26,7 @@ describe('Protected endpoints', function () {
 
     afterEach('cleanup', () => helpers.cleanTables(db))
 
-    beforeEach('insert locations', () =>
+    beforeEach('insert problems', () =>
         helpers.seedDbTables(
             db,
             testUsers,
